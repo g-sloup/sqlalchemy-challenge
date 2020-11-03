@@ -58,8 +58,7 @@ def precipitation():
 
     for date, prcp in results:
         prcp_dict = {}
-        prcp_dict["date"] = date
-        prcp_dict["prcp"] = prcp
+        prcp_dict["date"] = prcp
         prcp_list.append(prcp_dict)
 
     session.close()
@@ -74,14 +73,14 @@ def stations():
     session = Session(engine)
 
     # Return a JSON list of stations from the dataset.
-    stations = session.query(Station.station, Station.name).all()
+    stations = session.query(Station.station).all()
+
+    # Convert list of tuples into normal list
+    stations_list = list(np.ravel(stations))
 
     session.close()
 
-    # Convert list of tuples into normal list
-    # stations_list = list(np.ravel(stations))
-
-    return jsonify(stations)
+    return jsonify(stations_list = stations_list)
 
 
 @app.route("/api/v1.0/tobs")
@@ -90,8 +89,7 @@ def tobs():
     session = Session(engine)
 
     # Query the dates and temperature observations of the most active station for the last year of data
-    temps = session.query(Measurement.date, Measurement.tobs).filter(Measurement.station = "USC00519281").
-    filter(Measurement.date >= "2016-08-23").all()
+    temps = session.query(Measurement.date, Measurement.tobs).filter(Measurement.station == "USC00519281").filter(Measurement.date >= "2016-08-23").all()
 
     session.close()
 
@@ -103,7 +101,7 @@ def tobs():
 def start(start_date):
     # Create session (link) from Python to DB
     session = Session(engine)
-\
+
     # Query minimum temperature, the average temperature, and the max temperature
     start_date = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).filter(Measurement.date >= date).all()
 
